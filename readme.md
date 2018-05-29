@@ -46,7 +46,7 @@ appium-doctor
 Si tout est ok, vous devez avoir une sortie du type : 
 
 ```
-MACBOOKAIR-NICO:feazy-tests nd$ appium-doctor
+MACBOOKAIR-NICO:E2E nd$ appium-doctor
 info AppiumDoctor Appium Doctor v.1.4.3
 info AppiumDoctor ### Diagnostic starting ###
 info AppiumDoctor  ✔ The Node.js binary was found at: /usr/local/bin/node
@@ -276,16 +276,16 @@ module.exports = {
       // Browser is the browser that is being controlled
 
       browser
-        .url('https://feazy.coaxys.com') 
+        .url('https://toto.com') 
         .waitForElementVisible('body', 2000) 
-        .verify.title('Authentification | Feazy') 
+        .verify.title('Authentification | Toto') 
 
-        .setValue('input[name=username]', 'nicolas.dujardin@coaxys.com')
+        .setValue('input[name=username]', 'nd@toto.com')
         .setValue('input[name=password]', 'toto')
         .submitForm('form#form-login')
 
         .pause(2000)
-        .verify.title('Vue d\'ensemble | Feazy')  
+        .verify.title('Vue d\'ensemble | Toto')  
 
         .end() // This must be called to close the browser at the end
       }
@@ -304,15 +304,14 @@ Le code est plutôt explicite de lui même :
 En sortie, vous devriez obtenir :
 
 ``` bash
- tests/web/login   [INFO] [Nightwatch Extra] Found nightwatch configuration at /Users/nd/Documents/Coaxys/TEST/feazy-tests/nightwatch.conf.js
  tests/web/login   \n
  tests/web/login   [Web / Login] Test Suite
 ============================
  tests/web/login
  tests/web/login   Results for:  En tant qu'administrateur global je veux ajouter une structure
  tests/web/login   ✔ Element <body> was visible after 58 milliseconds.
- tests/web/login   ✔ Testing if the page title equals "Authentification | Feazy".
- tests/web/login   ✔ Testing if the page title equals "Vue d'ensemble | Feazy".
+ tests/web/login   ✔ Testing if the page title equals "Authentification | Toto".
+ tests/web/login   ✔ Testing if the page title equals "Vue d'ensemble | Toto".
  tests/web/login   OK. 3 assertions passed. (6.35s)
 
   >> tests/web/login finished.
@@ -365,8 +364,8 @@ iosSim: {
         "showXcodeLog" : true,
         "platformVersion": "10.3.3",
         "deviceName": "iPhone",
-        "udid": "f9138410fe1003d220f63a914d1a455931a7f155",
-        "bundleId" : "com.coaxys.EasyLifeConnect"
+        "udid": "[YOUR_UDID]",
+        "bundleId" : "com.toto.test"
        },
       selenium: {
         "start_process": false
@@ -419,7 +418,7 @@ iosSim: {
         "platformName": "Android",
         "platformVersion": "6.0",
         "deviceName": "SAMSUNG GTI9100",
-        "udid": "W3D7N16C02034234",
+        "udid": "YOUR_UDID",
         "autoGrantPermissions": true,
         "autoAcceptAlerts": true
       },
@@ -487,13 +486,6 @@ Pour ios, il est aussi vivement conseillé d'activer les logs xcode (showXcodeLo
 
 Enfin, Il faut bien vérfiier que els informatiosn de modèle et d'UID sont cohérentes, y compris les noms des simulateurs et leurs version d'OS.
 
-# Repo Exemple 
-
-Feazy sert de "cobaye" a cette démarche. Le repo :
-
-```bash
-git clone git@bitbucket.org:coaxys/feazy-tests.git
-```
 
 # Ressources
 
