@@ -1,3 +1,5 @@
+require('babel-register')()
+
 // Get Selenium and the drivers
 var seleniumServer = require('selenium-server');
 var chromedriver = require('chromedriver');
@@ -15,7 +17,7 @@ var config = {
     'tests'
   ],
   output_folder: 'reports', // Where to output the test reports
-
+  page_objects_path : "pages",
   globals_path: "globals.js",
 
   custom_assertions_path: [

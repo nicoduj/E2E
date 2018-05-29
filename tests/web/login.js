@@ -16,7 +16,29 @@ module.exports = {
         .pause(2000)
         .verify.title('[HOME PAGE TITLE]')  
 
-        .end() // This must be called to close the browser at the end
+        .end(); // This must be called to close the browser at the end
+      },
+
+      "En tant qu\'utilisateur je veux me connecter (version Pages)": function(browser) {
+        // Browser is the browser that is being controlled
+        const loginPage = browser.page.loginPage();
+        const instancesPage = browser.page.instancesPage();
+
+        loginPage
+          .navigate();
+
+        browser.waitForElementVisible('body', 2000);
+
+        instancesPage.expect.element('@loginTitle').text.contain('[AUTH PAGE TITLE]');
+
+        loginPage
+          .login("nd@toto.com", "test");
+
+        browser.pause(2000);
+
+        instancesPage.expect.element('@homeTitle').text.to.contain('[HOME PAGE TITLE]') ; 
+  
+        browser.end(); // This must be called to close the browser at the end
       }
 
   }

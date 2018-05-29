@@ -1,5 +1,6 @@
+# Tests automatiques
 
-# Objectif
+## Objectif
 
 L'objectif  de ce document est de lister les étapes nécessaires pour  pouvoir écrire des scénarii de tests (tests end to end - E2E), éxécuté en environnement utilisateur (browser / app mobile), et intégrable dans une chaine d'IC. 
 
@@ -8,12 +9,12 @@ Nous utiliserons nightwatch.js comme framework. Il fait appel à W3C WebDriver A
 Nous verrons également comment le combiner à appium afin de réaliser, sur la même architecture, des tests d'application Mobile Native (ou Web).
 
 
-# Installation de l'environnement
+## Installation de l'environnement
 
 Les informations ci-après sont issues de l'installation sur sur MAC.
 L'ensemble est isntallé dans le contexte d'un projet, et non pas en global .
 
-## Pré-requis
+### Pré-requis
 
 
 * Node.js : https://nodejs.org/en/download/
@@ -46,7 +47,7 @@ appium-doctor
 Si tout est ok, vous devez avoir une sortie du type : 
 
 ```
-MACBOOKAIR-NICO:E2E nd$ appium-doctor
+MACBOOKAIR-NICO:feazy-tests nd$ appium-doctor
 info AppiumDoctor Appium Doctor v.1.4.3
 info AppiumDoctor ### Diagnostic starting ###
 info AppiumDoctor  ✔ The Node.js binary was found at: /usr/local/bin/node
@@ -69,15 +70,15 @@ info AppiumDoctor Everything looks good, bye!
 info AppiumDoctor
 ```
 
-## Les packages
+### Les packages
 
 Le fichier package.json exemple : 
 
 ```json
 {
-  "name": "E2E",
+  "name": "feazy-test",
   "version": "1.0.0",
-  "description": "tests E2E",
+  "description": "tests feazy",
   "main": "",
   "author": "Nicolas Dujardin",
   "license": "ISC",
@@ -96,7 +97,7 @@ Le fichier package.json exemple :
 }
 ```
 
-## Initialisation d'un projet 
+### Initialisation d'un projet 
 
 Avec ce fichier, il vous suffit donc de créer votre projet node.js, puis d'installer les packages npm : 
 
@@ -105,9 +106,9 @@ npm -init
 npm -install
 ```
 
-# Configuration des tests
+## Configuration des tests
 
-## NightWatch
+### NightWatch
 
 Afin de configurer NightWatch, il suffit de créer un fichier *nightwatch.conf.js*
 
@@ -195,7 +196,7 @@ On retrouve dans ce fichier les différentes configuration pour les différents 
 
 Les répertoires tests / reports doivent exister, et le premier contiendra vos tests sous la forme de fichiers js.
 
-## Appium
+### Appium
 
 Afin de lancer / arrêter automatiquement appium pour les tests sur mobile, il faut créer un fichier *globals.js* : 
 
@@ -231,7 +232,7 @@ var config = {
 ```
 
 
-# Lancement de tests
+## Lancement de tests
 
 Dans votre fichier package.json, ajouter les scripts pour lancer les tests
 
@@ -265,7 +266,7 @@ Pour lancer une séquence de test, il faut alors faire, par exemple  :
 npm run nightwatch_chrome
 ```
 
-# Un test Web
+## Un test Web
 
 Créez un fichier "login.js" dans votre répertoire tests, de cette forme : 
 
@@ -276,16 +277,16 @@ module.exports = {
       // Browser is the browser that is being controlled
 
       browser
-        .url('https://toto.com') 
+        .url('https://feazy.coaxys.com') 
         .waitForElementVisible('body', 2000) 
-        .verify.title('Authentification | Toto') 
+        .verify.title('Authentification | Feazy') 
 
-        .setValue('input[name=username]', 'nd@toto.com')
+        .setValue('input[name=username]', 'nicolas.dujardin@coaxys.com')
         .setValue('input[name=password]', 'toto')
         .submitForm('form#form-login')
 
         .pause(2000)
-        .verify.title('Vue d\'ensemble | Toto')  
+        .verify.title('Vue d\'ensemble | Feazy')  
 
         .end() // This must be called to close the browser at the end
       }
@@ -304,24 +305,144 @@ Le code est plutôt explicite de lui même :
 En sortie, vous devriez obtenir :
 
 ``` bash
+ tests/web/login   [INFO] [Nightwatch Extra] Found nightwatch configuration at /Users/nd/Documents/Coaxys/TEST/feazy-tests/nightwatch.conf.js
  tests/web/login   \n
  tests/web/login   [Web / Login] Test Suite
 ============================
  tests/web/login
  tests/web/login   Results for:  En tant qu'administrateur global je veux ajouter une structure
  tests/web/login   ✔ Element <body> was visible after 58 milliseconds.
- tests/web/login   ✔ Testing if the page title equals "Authentification | Toto".
- tests/web/login   ✔ Testing if the page title equals "Vue d'ensemble | Toto".
+ tests/web/login   ✔ Testing if the page title equals "Authentification | Feazy".
+ tests/web/login   ✔ Testing if the page title equals "Vue d'ensemble | Feazy".
  tests/web/login   OK. 3 assertions passed. (6.35s)
 
   >> tests/web/login finished.
 ``` 
 
-# Et sur mobile ?
 
-## Ajout des sections de conf à votre fichier nightwatch
+## Factorisation
 
-### IOS - simulateur
+On se rend assez vite compte que chaque test risque de reprendrendre le même code, ne serait-ce que pour se connecter au site.
+
+Ainsi, il semble intéressant d'utiliser la déifnition de "pages" pour factoriser notre code.
+
+Pour se faire, il convient d'ajouter babel pour nous simplifier la vie au projet, et donc les packages suivants :
+
+``` json
+  "devDependencies": {
+	...
+    "babel-core": "^6.26.3",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-preset-es2015": "^6.24.1",
+		...
+``` 
+
+Ensuite, nous devons créer un fichier *.babelrc*
+
+``` json
+{
+    "presets": ["es2015"],
+    "plugins": [
+      "add-module-exports"
+    ]
+}
+``` 
+
+Enfin, il faut ajouter dans el fichier *nightwatch.conf.js* en début la dépendance et le chemin du répertoire qui va contenir nos pages :
+
+``` javascript
+require('babel-register')()
+
+...
+var config = {
+...
+  page_objects_path : "pages",
+	...
+
+``` 
+
+Un exemple ci après de fichier page *loginPage.js* (à mettre dans le répertoire *pages* donc au même niveau que le répertoire contenant les tests)  :
+
+``` javascript
+const loginCommands = {  
+    login(email, password) {
+      return this
+        .waitForElementVisible('body', 2000) 
+        .setValue('@emailInput', email)
+        .setValue('@passwordInput', password)
+        .submitForm('@loginForm')
+    }
+  };
+  
+  export default {  
+    url: 'https://monsite.com',
+    commands: [loginCommands],
+    elements: {
+      emailInput: {
+        selector: 'input[name=username]'
+      },
+      passwordInput: {
+        selector: 'input[name=password]'
+      },
+      loginForm: {
+        selector: 'form#form-login'
+      }
+    }
+  };
+``` 
+
+On peut également définir les pages du site pour la aussi simplifier les vérifications , dans un fichier *instancesPage.js* 
+
+``` javascript
+export default {  
+    elements: {
+      homeTitle: {
+        selector: '/html/body/div/div/main/h1',
+        locateStrategy: 'xpath'
+      },
+      loginTitle: {
+        selector: '/html/body/div/div/hgroup/h2',
+        locateStrategy: 'xpath'
+      }
+    }
+  };
+``` 
+
+On pourra alors écrire notre test de la façon suivante : 
+
+``` javascript
+
+module.exports = {
+
+    "En tant qu\'utilistaeur je veux me connecter pour voir ": function(browser) {
+        // Browser is the browser that is being controlled
+        const loginPage = browser.page.loginPage();
+        const instancesPage = browser.page.instancesPage();
+
+        loginPage
+          .navigate();
+
+        browser.waitForElementVisible('body', 2000)
+
+        instancesPage.expect.element('@loginTitle').text.contain('Mon titre !');
+
+        loginPage
+          .login("nd@toto.com", "toto");
+
+        browser.pause(2000);
+
+        instancesPage.expect.element('@homeTitle').text.to.contain('Vue d\'ensemble') ; 
+  
+        browser.end() // This must be called to close the browser at the end
+      }
+  }
+``` 
+
+## Et sur mobile ?
+
+### Ajout des sections de conf à votre fichier nightwatch
+
+#### IOS - simulateur
 
 ``` javascript
 iosSim: {
@@ -349,7 +470,7 @@ iosSim: {
 ``` 
 
 
-### IOS - Real Device
+#### IOS - Real Device
 
 ``` javascript
     iosDevice: {
@@ -364,8 +485,8 @@ iosSim: {
         "showXcodeLog" : true,
         "platformVersion": "10.3.3",
         "deviceName": "iPhone",
-        "udid": "[YOUR_UDID]",
-        "bundleId" : "com.toto.test"
+        "udid": "f9138410fe1003d220f63a914d1a455931a7f155",
+        "bundleId" : "com.coaxys.EasyLifeConnect"
        },
       selenium: {
         "start_process": false
@@ -377,7 +498,7 @@ iosSim: {
     }
 ``` 
 	
-### Android - simulateur
+#### Android - simulateur
 
 ```javascript
     androidSim: {
@@ -404,7 +525,7 @@ iosSim: {
       }
     }
 ``` 
-### Android - Real Device
+#### Android - Real Device
 
 ``` javascript 
     androidDevice: {
@@ -418,7 +539,7 @@ iosSim: {
         "platformName": "Android",
         "platformVersion": "6.0",
         "deviceName": "SAMSUNG GTI9100",
-        "udid": "YOUR_UDID",
+        "udid": "W3D7N16C02034234",
         "autoGrantPermissions": true,
         "autoAcceptAlerts": true
       },
@@ -432,7 +553,7 @@ iosSim: {
     }
 ``` 
 
-## Un test
+### Un test
 
 Les test doivent être écrits avec de scommandes dédiées au mobiles . Cf  https://github.com/TestArmada/nightwatch-extra/blob/master/docs/ios.md et https://github.com/TestArmada/nightwatch-extra/blob/master/docs/android.md pour la liste des commandes
 
@@ -440,7 +561,7 @@ A ce stade, les test Andoid / IOS ne peuvenêtret  mutualisés du fait de mécan
 
 Il est possible d'utiliser des requêtes Xpath, mais là encore les paths seraient différents.
 
-### IOS
+#### IOS
 
 Sous IOS, on va chercher les composants par leur accessibility id. Il convient que ces denriers aient été séttés sous Xcode.
 
@@ -458,7 +579,7 @@ module.exports = {
   }
 ``` 
 
-### Android
+#### Android
 
 Sous Android, on va chercher les composants par leur id. 
 
@@ -476,7 +597,7 @@ module.exports = {
   }
 ``` 
 
-## Points de vigilance
+### Points de vigilance
 
 D'un façon générale, sous Simulateur, i lfaut lancer le simulateur avant de lancer les tests, sinon on aura bien souvent un timeout.
 
@@ -484,10 +605,27 @@ Pour IOS, sur realDevice, il faut s'assurer que le projet suivant build, en mett
 
 Pour ios, il est aussi vivement conseillé d'activer les logs xcode (showXcodeLog in nightwatch.conf.js)
 
-Enfin, Il faut bien vérfiier que els informatiosn de modèle et d'UID sont cohérentes, y compris les noms des simulateurs et leurs version d'OS.
+Enfin, Il faut bien vérfiier que les informatiosn de modèle et d'UID sont cohérentes, y compris les noms des simulateurs et leurs version d'OS.
 
+A noter, si vous ne voyez pas les erreurs lors d'un test, il faut essayer de désactiver l'option de parallélisation dans le fichiez *nightwatch.conf.js* (sauf avec un test appium, ou il faut nécessairement l'activer): 
 
-# Ressources
+```javascript
+
+ test_workers: {
+    // This allows more then one browser to be opened and tested in at once
+    enabled: false,
+    workers: 'auto'
+  },
+
+## Repo Exemple 
+
+Feazy sert de "cobaye" a cette démarche. Le repo :
+
+```bash
+git clone git@bitbucket.org:coaxys/feazy-tests.git
+```
+
+## Ressources
 
 Tutorial principal qui a servi de base : 
 * https://www.codementor.io/johnkennedy/e2e-testing-with-nightwatch-part-one-b44jzd6mv
