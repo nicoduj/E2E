@@ -75,9 +75,9 @@ Le fichier package.json exemple :
 
 ```json
 {
-  "name": "feazy-test",
+  "name": "E2E",
   "version": "1.0.0",
-  "description": "tests feazy",
+  "description": "tests E2E",
   "main": "",
   "author": "Nicolas Dujardin",
   "license": "ISC",
