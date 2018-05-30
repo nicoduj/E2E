@@ -599,13 +599,13 @@ module.exports = {
 
 ### Points de vigilance
 
-D'un façon générale, sous Simulateur, i lfaut lancer le simulateur avant de lancer les tests, sinon on aura bien souvent un timeout.
+D'une façon générale, sous Simulateur, il faut lancer le simulateur avant de lancer les tests, sinon on aura bien souvent un timeout.
 
-Pour IOS, sur realDevice, il faut s'assurer que le projet suivant build, en mettant à jour els identités de signature pour qu'ils pouissent se déployer sur le mobileê (qui doit tre associé au compte DEV) : *node_modules/appium/node_modules/appium-xcuitest-driver/WebDriverAgent/WebDriverAgent.xcodeproj*
+Pour IOS, sur realDevice, il faut s'assurer que le projet suivant build, en mettant à jour les identités de signature pour qu'il pouisse se déployer sur le mobile (qui doit être associé au compte DEV) : *node_modules/appium/node_modules/appium-xcuitest-driver/WebDriverAgent/WebDriverAgent.xcodeproj*
 
 Pour ios, il est aussi vivement conseillé d'activer les logs xcode (showXcodeLog in nightwatch.conf.js)
 
-Enfin, Il faut bien vérfiier que les informatiosn de modèle et d'UID sont cohérentes, y compris les noms des simulateurs et leurs version d'OS.
+Enfin, Il faut bien vérfiier que les informations de modèle et d'UID sont cohérentes, y compris les noms des simulateurs et leurs versions d'OS.
 
 A noter, si vous ne voyez pas les erreurs lors d'un test, il faut essayer de désactiver l'option de parallélisation dans le fichiez *nightwatch.conf.js* (sauf avec un test appium, ou il faut nécessairement l'activer): 
 
